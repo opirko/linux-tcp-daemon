@@ -4,12 +4,14 @@
 #include <exception>
 #include <string>
 
+#include "Application.hpp"
+
 int main(int argc, char* argv[]) {
     openlog("OP-TCP-Daemon", LOG_NDELAY, LOG_DAEMON);
     try {
         syslog(LOG_DEBUG, "OP TCP Daemon started");
-        // Application TCPDaemon;
-        // TCPDaemon.run();
+        tcpdae::Application TCPDaemon;
+        TCPDaemon.run();
     } catch (const std::exception& e) {
         std::string exc = {"OP TCP Daemon exception : "};
         exc += e.what();
