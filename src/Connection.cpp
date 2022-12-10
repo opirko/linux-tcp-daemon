@@ -6,16 +6,12 @@ namespace tcpdae {
 
 void Connection::start() {
     syslog(LOG_DEBUG, "Connection-start");
-    readInput();
-    /*boost::asio::async_write(
-        mSocket, boost::asio::buffer(mMessage),
-        boost::bind(&Connection::handle_write, shared_from_this(), boost::asio::placeholders::error,
-                    boost::asio::placeholders::bytes_transferred));*/
+    processRequest();
 }
 
 // ==================== PRIVATE ====================
 
-void Connection::readInput() {
+void Connection::processRequest() {
     auto self = shared_from_this();
     boost::asio::async_read_until(
         mSocket, mRequest, "\n", [this, self](const boost::system::error_code ec, const size_t) {

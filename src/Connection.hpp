@@ -31,7 +31,7 @@ class Connection : public std::enable_shared_from_this<Connection> {
    private:
     // Methods
     /// @brief Reads input from client
-    void readInput();
+    void processRequest();
 
     // Variables
     asiotcp::socket mSocket;
