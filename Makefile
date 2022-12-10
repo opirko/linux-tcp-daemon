@@ -1,7 +1,7 @@
 PROGNAME = LinuxTcpDaemon
 
 CXX = g++
-CPPFLAGS = -std=c++14 -Wall -pedantic
+CPPFLAGS = -std=c++14 -Wall -pedantic -pthread
 
 CODEDIR = src
 BUILDDIR = build

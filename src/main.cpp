@@ -8,7 +8,7 @@
 #include <exception>
 #include <string>
 
-#include "Application.hpp"
+#include "Server.hpp"
 
 /// @brief Daemonizes this application
 /// Skeleton from https://github.com/jirihnidek/daemon
@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) {
     openlog("OP-TCP-Daemon", LOG_NDELAY, LOG_DAEMON);
     try {
         syslog(LOG_DEBUG, "OP TCP Daemon started");
-        tcpdae::Application TCPDaemon;
+        tcpdae::Server TCPDaemon;
         TCPDaemon.run();
     } catch (const std::exception& e) {
         std::string exc = {"OP TCP Daemon exception : "};
