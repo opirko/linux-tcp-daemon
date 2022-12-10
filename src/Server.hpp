@@ -3,6 +3,7 @@
 
 #include <boost/asio.hpp>
 #include <boost/asio/ip/tcp.hpp>
+#include <memory>
 
 #include "Connection.hpp"
 
@@ -32,7 +33,7 @@ class Server final {
     // methods
     void startAccept();
 
-    void handleAccept(Connection::ptr new_connection, const boost::system::error_code& error);
+    void handleAccept(std::shared_ptr<Connection> con, const boost::system::error_code& error);
 
     // variables
     boost::asio::io_context mContext;

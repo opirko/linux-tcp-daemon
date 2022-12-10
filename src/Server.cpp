@@ -11,35 +11,38 @@ using asiotcp = boost::asio::ip::tcp;
 
 // ==================== PUBLIC ====================
 
-Server::Server() : mAcceptor(mContext, asiotcp::endpoint(asiotcp::v4(), 5001)) { startAccept(); }
+// construct socket, start listening and accepting
+Server::Server() : mAcceptor(mContext, asiotcp::endpoint(asiotcp::v4(), 5001)) {
+    mAcceptor.listen();
+    startAccept();
+}
 
 void Server::run() {
-    syslog(LOG_DEBUG, "Doing work");
-    std::async(std::launch::async, [this]() {
+    /*std::async(std::launch::async, [this]() {
         std::this_thread::sleep_for(std::chrono::seconds{15});
         syslog(LOG_DEBUG, "Stopping ASIO IO context");
         mContext.stop();
-    });
+    });*/
+    syslog(LOG_DEBUG, "Running ASIO IO context");
     // blocks current thread
     mContext.run();
-    syslog(LOG_DEBUG, "Done work");
 }
 
 // ==================== PRIVATE ====================
 
 void Server::startAccept() {
     syslog(LOG_DEBUG, "startAccept start");
-    Connection::ptr new_connection = Connection::create(mContext);
+    auto con = std::make_shared<Connection>(mContext);
 
-    mAcceptor.async_accept(new_connection->socket(),
-                           boost::bind(&Server::handleAccept, this, new_connection, boost::asio::placeholders::error));
+    mAcceptor.async_accept(con->getSocket(),
+                           boost::bind(&Server::handleAccept, this, con, boost::asio::placeholders::error));
     syslog(LOG_DEBUG, "startAccept end");
 }
 
-void Server::handleAccept(Connection::ptr new_connection, const boost::system::error_code& error) {
+void Server::handleAccept(std::shared_ptr<Connection> con, const boost::system::error_code& error) {
     syslog(LOG_DEBUG, "handleAccept start");
     if (!error) {
-        new_connection->start();
+        con->start();
     }
     startAccept();
     syslog(LOG_DEBUG, "handleAccept end");

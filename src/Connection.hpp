@@ -6,37 +6,37 @@
 #include <boost/asio.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/bind/bind.hpp>
-#include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
+#include <memory>
 
 namespace tcpdae {
 
-class Connection : public boost::enable_shared_from_this<Connection> {
+/// @brief Connection handler
+/// Can get a shared ptr to itself to control lifetime
+class Connection : public std::enable_shared_from_this<Connection> {
    public:
     using asiotcp = boost::asio::ip::tcp;
-    using ptr = boost::shared_ptr<Connection>;
 
-    static ptr create(boost::asio::io_context& io_context) { return ptr(new Connection(io_context)); }
+    /// @brief constructor
+    /// @param context asio context
+    Connection(boost::asio::io_context& context) : mSocket(context) {}
 
-    asiotcp::socket& socket() { return mSocket; }
+    /// @brief getter for socket
+    /// @return socket ref
+    asiotcp::socket& getSocket() { return mSocket; }
 
-    void start() {
-        syslog(LOG_DEBUG, "Connection-start");
-        mMessage = "TESTINGMESSAGE";
-
-        boost::asio::async_write(
-            mSocket, boost::asio::buffer(mMessage),
-            boost::bind(&Connection::handle_write, shared_from_this(), boost::asio::placeholders::error,
-                        boost::asio::placeholders::bytes_transferred));
-    }
+    /// @brief Handle connection
+    void start();
 
    private:
-    Connection(boost::asio::io_context& io_context) : mSocket(io_context) {}
+    // Methods
+    /// @brief Reads input from client
+    void readInput();
 
-    void handle_write(const boost::system::error_code& /*error*/, size_t /*bytes_transferred*/) {}
-
+    // Variables
     asiotcp::socket mSocket;
     std::string mMessage;
+    boost::asio::streambuf mRequest;
 };
 
 }  // namespace tcpdae
