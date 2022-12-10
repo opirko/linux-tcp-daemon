@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
     daemonize();
     openlog("OP-TCP-Daemon", LOG_NDELAY, LOG_DAEMON);
     try {
-        syslog(LOG_DEBUG, "OP TCP Daemon started");
+        syslog(LOG_INFO, "OP TCP Daemon started");
         tcpdae::Server TCPDaemon;
         TCPDaemon.run();
     } catch (const std::exception& e) {
@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) {
         closelog();
         std::terminate();
     }
-    syslog(LOG_DEBUG, "OP TCP Daemon stopped");
+    syslog(LOG_INFO, "OP TCP Daemon stopped");
     closelog();
     return EXIT_SUCCESS;
 }

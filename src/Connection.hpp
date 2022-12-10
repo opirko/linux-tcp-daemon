@@ -33,7 +33,13 @@ class Connection : public std::enable_shared_from_this<Connection> {
     /// @brief Reads input from client
     void processRequest();
 
+    /// @brief Executes command given as parameter
+    /// @param cmd command to execute
+    /// @return result of the command
+    std::string doCommand(const std::string& cmd);
+
     // Variables
+    static constexpr char kClassName[]{"Connection"};
     asiotcp::socket mSocket;
     std::string mMessage;
     boost::asio::streambuf mRequest;

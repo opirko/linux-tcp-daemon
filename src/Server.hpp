@@ -36,6 +36,7 @@ class Server final {
     void handleAccept(std::shared_ptr<Connection> con, const boost::system::error_code& error);
 
     // variables
+    static constexpr char kClassName[]{"Server"};
     boost::asio::io_context mContext;
     boost::asio::ip::tcp::acceptor mAcceptor;
 };

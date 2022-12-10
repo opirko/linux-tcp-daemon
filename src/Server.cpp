@@ -9,6 +9,8 @@ namespace tcpdae {
 
 using asiotcp = boost::asio::ip::tcp;
 
+constexpr char Server::kClassName[];
+
 // ==================== PUBLIC ====================
 
 // construct socket, start listening and accepting
@@ -31,21 +33,18 @@ void Server::run() {
 // ==================== PRIVATE ====================
 
 void Server::startAccept() {
-    syslog(LOG_DEBUG, "startAccept start");
+    syslog(LOG_DEBUG, "%s::%s", kClassName, __func__);
     auto con = std::make_shared<Connection>(mContext);
-
     mAcceptor.async_accept(con->getSocket(),
                            boost::bind(&Server::handleAccept, this, con, boost::asio::placeholders::error));
-    syslog(LOG_DEBUG, "startAccept end");
 }
 
 void Server::handleAccept(std::shared_ptr<Connection> con, const boost::system::error_code& error) {
-    syslog(LOG_DEBUG, "handleAccept start");
+    syslog(LOG_DEBUG, "%s::%s", kClassName, __func__);
     if (!error) {
         con->start();
     }
     startAccept();
-    syslog(LOG_DEBUG, "handleAccept end");
 }
 
 }  // namespace tcpdae
