@@ -26,9 +26,6 @@ class Server final {
     /// @brief run application
     void run();
 
-    ///@brief stop application
-    void stop();
-
    private:
     // methods
     void startAccept();

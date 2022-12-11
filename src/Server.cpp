@@ -20,11 +20,13 @@ Server::Server() : mAcceptor(mContext, asiotcp::endpoint(asiotcp::v4(), 5001)) {
 }
 
 void Server::run() {
-    /*std::async(std::launch::async, [this]() {
-        std::this_thread::sleep_for(std::chrono::seconds{15});
-        syslog(LOG_DEBUG, "Stopping ASIO IO context");
-        mContext.stop();
-    });*/
+    // Add signals to process termination
+    boost::asio::signal_set signals(mContext);
+    signals.add(SIGTERM);
+    signals.add(SIGINT);
+    // Async wait for signals to occur
+    signals.async_wait([this](const boost::system::error_code&, int) { mContext.stop(); });
+
     syslog(LOG_DEBUG, "Running ASIO IO context");
     // blocks current thread
     mContext.run();

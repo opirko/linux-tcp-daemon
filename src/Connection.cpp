@@ -19,17 +19,31 @@ void Connection::processRequest() {
         mSocket, mRequest, "\n", [this, self](const boost::system::error_code ec, const size_t) {
             if (!ec || ec == boost::asio::error::eof) {
                 // convert request stream to std string
-                std::string str((std::istreambuf_iterator<char>(&mRequest)), std::istreambuf_iterator<char>());
-                // do command without the "\n0"
-                std::string ret = doCommand(str.substr(0, str.size() - 3));
+                std::string inp((std::istreambuf_iterator<char>(&mRequest)), std::istreambuf_iterator<char>());
+                // remove "\n" from string
+                if (inp.back() == '\n') {
+                    inp = inp.substr(0, inp.size() - 1);
+                }
+                std::string ret = doCommand(inp);
+                syslog(LOG_DEBUG, "Sending message %s to request %s", ret.c_str(), inp.c_str());
                 // send data
             }
         });
 }
 
-std::string Connection::doCommand(const std::string& cmd) {
+std::string Connection::doCommand(const std::string& cmd) const {
     syslog(LOG_INFO, "Executing command : %s", cmd.c_str());
-    return "";
+    if (cmd == "cpu") {
+        return getCpu();
+    } else if (cmd == "mem") {
+        return getMem();
+    } else {
+        return "Invalid command";
+    }
 }
+
+std::string Connection::getCpu() const { return std::to_string(50.5f); }
+
+std::string Connection::getMem() const { return std::to_string(4000); }
 
 }  // namespace tcpdae

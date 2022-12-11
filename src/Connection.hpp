@@ -36,7 +36,15 @@ class Connection : public std::enable_shared_from_this<Connection> {
     /// @brief Executes command given as parameter
     /// @param cmd command to execute
     /// @return result of the command
-    std::string doCommand(const std::string& cmd);
+    std::string doCommand(const std::string& cmd) const;
+
+    /// @brief Returns cpu usage
+    /// @return String containing cpu usage
+    std::string getCpu() const;
+
+    /// @brief Returns memory usage
+    /// @return String containing memory usage
+    std::string getMem() const;
 
     // Variables
     static constexpr char kClassName[]{"Connection"};
