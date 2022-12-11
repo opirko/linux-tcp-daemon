@@ -1,4 +1,5 @@
 #!/bin/bash
+# Sends test data via netcat
 
 for a in "mem" "cpu" "cpu" "mem" "nonsense" "mem";
 do
