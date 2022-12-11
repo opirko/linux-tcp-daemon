@@ -1,26 +1,36 @@
 PROGNAME = LinuxTcpDaemon
+CLIENTNAME = sampleClient
 
 CXX = g++
 CPPFLAGS = -std=c++14 -Wall -pedantic -pthread
 
-CODEDIR = src
+CODEDIR = src/server
 BUILDDIR = build
 SRCFILES = $(wildcard ${CODEDIR}/*.cpp)
 OBJECTS  = $(patsubst ${CODEDIR}%.cpp, ${BUILDDIR}%.o, $(SRCFILES))
 # $@ - target; $< - first prereq; $^ - all prereq
 
 
-all: buildDir $(BUILDDIR)/$(PROGNAME)
+all: buildDir $(BUILDDIR)/$(PROGNAME) $(BUILDDIR)/$(CLIENTNAME)
 
 buildDir:
 	mkdir -p $(BUILDDIR)
 
-$(BUILDDIR)/$(PROGNAME) : $(OBJECTS)
-	$(info Linking objects to ELF.)
+# client
+$(BUILDDIR)/$(CLIENTNAME) : $(BUILDDIR)/client.o
 	$(CXX) $(CPPFLAGS) -o $@ $^
+	$(info Linked objects to Client ELF.)
+
+$(BUILDDIR)/client.o : src/client/client.cpp
+	$(CXX) $(CFLAGS) -c $< -o $@
+
+# server
+$(BUILDDIR)/$(PROGNAME) : $(OBJECTS)
+	$(CXX) $(CPPFLAGS) -o $@ $^
+	$(info Linked objects to Server ELF.)
 
 $(BUILDDIR)/%.o: $(CODEDIR)/%.cpp
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CXX) $(CFLAGS) -c $< -o $@
 
 format:
 	find src/ -iname *.hpp -o -iname *.cpp | xargs clang-format -i
