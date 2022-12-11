@@ -1,5 +1,5 @@
 PROGNAME = LinuxTcpDaemon
-CLIENTNAME = sampleClient
+CLIENTNAME = ClientTcp
 
 CXX = g++
 CPPFLAGS = -std=c++14 -Wall -pedantic -pthread
@@ -22,7 +22,7 @@ $(BUILDDIR)/$(CLIENTNAME) : $(BUILDDIR)/client.o
 	$(info Linked objects to Client ELF.)
 
 $(BUILDDIR)/client.o : src/client/client.cpp
-	$(CXX) $(CFLAGS) -c $< -o $@
+	$(CXX) $(CPPFLAGS) -c $< -o $@
 
 # server
 $(BUILDDIR)/$(PROGNAME) : $(OBJECTS)
@@ -30,7 +30,7 @@ $(BUILDDIR)/$(PROGNAME) : $(OBJECTS)
 	$(info Linked objects to Server ELF.)
 
 $(BUILDDIR)/%.o: $(CODEDIR)/%.cpp
-	$(CXX) $(CFLAGS) -c $< -o $@
+	$(CXX) $(CPPFLAGS) -c $< -o $@
 
 format:
 	find src/ -iname *.hpp -o -iname *.cpp | xargs clang-format -i

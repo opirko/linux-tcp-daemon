@@ -16,8 +16,9 @@ int main(int argc, char* argv[]) {
     std::string req;
     std::cout << "Type your command: ";
     std::cin >> req;
-    std::cout << "Your command is: " << req;
+    std::cout << "Your command is: " << req << std::endl;
     boost::system::error_code ec;
+    req += "\n";
     boost::asio::write(socket, boost::asio::buffer(req), ec);
     if (!ec) {
         std::cout << "Message sent" << std::endl;
@@ -26,7 +27,8 @@ int main(int argc, char* argv[]) {
     }
     // getting response from server
     boost::asio::streambuf recBuf;
-    boost::asio::read(socket, recBuf, boost::asio::transfer_all(), ec);
+    // boost::asio::read(socket, recBuf, boost::asio::transfer_all(), ec);
+    boost::asio::read_until(socket, recBuf, "\n", ec);
     if (ec && ec != boost::asio::error::eof) {
         std::cout << "receive failed: " << ec.message() << std::endl;
     } else {

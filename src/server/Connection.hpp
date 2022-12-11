@@ -42,8 +42,6 @@ class Connection : public std::enable_shared_from_this<Connection> {
 
    private:
     // Methods
-    /// @brief Reads input from client
-    void processRequest();
 
     /// @brief Executes command given as parameter
     /// @param cmd command to execute

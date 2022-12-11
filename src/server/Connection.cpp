@@ -14,31 +14,28 @@ constexpr char Connection::kClassName[];
 
 void Connection::start() {
     syslog(LOG_DEBUG, "%s::%s", kClassName, __func__);
-    processRequest();
-}
-
-// ==================== PRIVATE ====================
-
-void Connection::processRequest() {
-    auto self = shared_from_this();
     boost::asio::async_read_until(
-        mSocket, mRequest, "\n", [this, self](const boost::system::error_code ec, const size_t) {
+        mSocket, mRequest, "\n", [me = shared_from_this()](const boost::system::error_code ec, const size_t) {
             if (!ec || ec == boost::asio::error::eof) {
                 // convert request stream to std string
-                std::string inp((std::istreambuf_iterator<char>(&mRequest)), std::istreambuf_iterator<char>());
+                std::string inp((std::istreambuf_iterator<char>(&me->mRequest)), std::istreambuf_iterator<char>());
                 // remove "\n" from string
                 if (inp.back() == '\n') {
                     inp = inp.substr(0, inp.size() - 1);
                 }
-                const std::string ret = doCommand(inp);
+                const std::string ret = me->doCommand(inp);
                 syslog(LOG_DEBUG, "Sending message %s to request %s", ret.c_str(), inp.c_str());
                 // send data
                 const std::string resp = ret + "\n";
-                boost::asio::write(mSocket, boost::asio::buffer(resp));
+                boost::asio::write(me->mSocket, boost::asio::buffer(resp));
                 syslog(LOG_DEBUG, "Data sent");
+            } else {
+                syslog(LOG_ERR, "Error code is: %s", ec.message().c_str());
             }
         });
 }
+
+// ==================== PRIVATE ====================
 
 std::string Connection::doCommand(const std::string& cmd) const {
     syslog(LOG_INFO, "Executing command : %s", cmd.c_str());
