@@ -21,19 +21,19 @@ class Connection : public std::enable_shared_from_this<Connection> {
     /// @param context asio context
     Connection(boost::asio::io_context& context) : mSocket(context) {}
 
-    // no default ctor
+    /// @brief No default ctor
     Connection() = delete;
 
-    ///@brief destroy the Connection object
+    ///@brief Destroy the Connection object
     ~Connection() = default;
 
-    // deleted copy, move constructors and assignment operators
+    // Deleted copy, move constructors and assignment operators
     Connection(const Connection&) = delete;
     Connection& operator=(const Connection&) = delete;
     Connection(Connection&&) = delete;
     Connection& operator=(Connection&&) = delete;
 
-    /// @brief getter for socket
+    /// @brief Getter for socket
     /// @return socket ref
     asiotcp::socket& getSocket() { return mSocket; }
 

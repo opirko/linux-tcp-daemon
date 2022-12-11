@@ -11,19 +11,19 @@ namespace tcpdae {
 
 class Server final {
    public:
-    ///@brief construct a new Server object
+    ///@brief Construct a new Server object
     Server();
 
-    ///@brief destroy the Server object
+    ///@brief Destroy the Server object
     ~Server() = default;
 
-    // deleted copy, move constructors and assignment operators
+    // Deleted copy, move constructors and assignment operators
     Server(const Server&) = delete;
     Server& operator=(const Server&) = delete;
     Server(Server&&) = delete;
     Server& operator=(Server&&) = delete;
 
-    /// @brief run application
+    /// @brief Run application
     void run();
 
    private:

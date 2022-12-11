@@ -14,7 +14,7 @@ constexpr int Server::kPort;
 
 // ==================== PUBLIC ====================
 
-// construct socket, start listening and accepting
+// Construct socket, start listening and accepting
 Server::Server() : mAcceptor(mContext, asiotcp::endpoint(asiotcp::v4(), kPort)) {
     mAcceptor.listen();
     startAccept();
@@ -29,7 +29,7 @@ void Server::run() {
     signals.async_wait([this](const boost::system::error_code&, int) { mContext.stop(); });
 
     syslog(LOG_DEBUG, "Running ASIO IO context");
-    // blocks current thread
+    // Blocks current thread
     mContext.run();
 }
 
@@ -47,7 +47,7 @@ void Server::handleAccept(std::shared_ptr<Connection> con, const boost::system::
     if (!error) {
         con->start();
     }
-    // accept other connections as well
+    // Accept other connections as well
     startAccept();
 }
 
