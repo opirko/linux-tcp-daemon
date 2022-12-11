@@ -30,9 +30,12 @@ void Connection::processRequest() {
                 if (inp.back() == '\n') {
                     inp = inp.substr(0, inp.size() - 1);
                 }
-                std::string ret = doCommand(inp);
+                const std::string ret = doCommand(inp);
                 syslog(LOG_DEBUG, "Sending message %s to request %s", ret.c_str(), inp.c_str());
                 // send data
+                const std::string resp = ret + "\n";
+                boost::asio::write(mSocket, boost::asio::buffer(resp));
+                syslog(LOG_DEBUG, "Data sent");
             }
         });
 }
@@ -54,7 +57,7 @@ static inline std::pair<size_t, size_t> getJiffies() {
     static constexpr char kStatPath[]{"/proc/stat"};
     static constexpr size_t kJiffyCnt{7};
     size_t jiffies[kJiffyCnt];
-    std::fstream f(kStatPath, std::ios_base::in);
+    std::ifstream f(kStatPath);
     // this should be "cpu, ignore it"
     std::string temp;
     f >> temp;
@@ -72,7 +75,6 @@ static inline std::pair<size_t, size_t> getJiffies() {
         }
         totalJif += jiffies[i];
     }
-    syslog(LOG_DEBUG, "Returning: %lu %lu", totalJif, workJif);
     return {totalJif, workJif};
 }
 
@@ -88,6 +90,42 @@ std::string Connection::getCpu() const {
     return std::to_string(cpu) + "%";
 }
 
-std::string Connection::getMem() const { return std::to_string(4000); }
+std::string Connection::getMem() const {
+    // path to meminfo, how many measurements we need to calculate
+    static constexpr char kMemPath[]{"/proc/meminfo"};
+    static constexpr char kError[]{"Error while reading memory"};
+    static constexpr size_t kMeasNeeded{4};
+    size_t memTotal, memFree, buffers, cached;
+    size_t meas{0};
+    std::string tok;
+    std::ifstream f(kMemPath);
+    // get all four readings that we need to calculate
+    while (f >> tok) {
+        if (tok == "MemTotal:") {
+            if (f >> memTotal)
+                meas++;
+            else
+                return kError;
+        } else if (tok == "MemFree:") {
+            if (f >> memFree)
+                meas++;
+            else
+                return kError;
+        } else if (tok == "Buffers:") {
+            if (f >> buffers)
+                meas++;
+            else
+                return kError;
+        } else if (tok == "Cached:") {
+            if (f >> cached)
+                meas++;
+            else
+                return kError;
+        }
+        if (meas == kMeasNeeded) break;
+    }
+    const size_t ret{memTotal - memFree - buffers - cached};
+    return std::to_string(ret) + " kB";
+}
 
 }  // namespace tcpdae

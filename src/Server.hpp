@@ -28,12 +28,15 @@ class Server final {
 
    private:
     // methods
+    /// @brief Starts the connection accept process
     void startAccept();
 
+    /// @brief Handles accepted connection, also starts a new accept
     void handleAccept(std::shared_ptr<Connection> con, const boost::system::error_code& error);
 
     // variables
     static constexpr char kClassName[]{"Server"};
+    static constexpr int kPort{5001};
     boost::asio::io_context mContext;
     boost::asio::ip::tcp::acceptor mAcceptor;
 };

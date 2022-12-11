@@ -10,11 +10,12 @@ namespace tcpdae {
 using asiotcp = boost::asio::ip::tcp;
 
 constexpr char Server::kClassName[];
+constexpr int Server::kPort;
 
 // ==================== PUBLIC ====================
 
 // construct socket, start listening and accepting
-Server::Server() : mAcceptor(mContext, asiotcp::endpoint(asiotcp::v4(), 5001)) {
+Server::Server() : mAcceptor(mContext, asiotcp::endpoint(asiotcp::v4(), kPort)) {
     mAcceptor.listen();
     startAccept();
 }
@@ -46,6 +47,7 @@ void Server::handleAccept(std::shared_ptr<Connection> con, const boost::system::
     if (!error) {
         con->start();
     }
+    // accept other connections as well
     startAccept();
 }
 
