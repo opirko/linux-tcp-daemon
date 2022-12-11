@@ -1,5 +1,11 @@
 #include "Connection.hpp"
 
+#include <boost/algorithm/string.hpp>
+#include <chrono>
+#include <fstream>
+#include <thread>
+#include <utility>
+
 namespace tcpdae {
 
 constexpr char Connection::kClassName[];
@@ -42,7 +48,45 @@ std::string Connection::doCommand(const std::string& cmd) const {
     }
 }
 
-std::string Connection::getCpu() const { return std::to_string(50.5f); }
+/// @brief returns jiffies - first total, second work
+static inline std::pair<size_t, size_t> getJiffies() {
+    // path to statfile and total jiffy count
+    static constexpr char kStatPath[]{"/proc/stat"};
+    static constexpr size_t kJiffyCnt{7};
+    size_t jiffies[kJiffyCnt];
+    std::fstream f(kStatPath, std::ios_base::in);
+    // this should be "cpu, ignore it"
+    std::string temp;
+    f >> temp;
+    for (size_t i = 0; i < kJiffyCnt; i++) {
+        f >> jiffies[i];
+    }
+    // calculate work and total jiffies
+    static constexpr size_t workJifCnt = 3;
+    size_t workJif = 0;
+    size_t totalJif = 0;
+    for (size_t i = 0; i < kJiffyCnt; i++) {
+        // first three are work jiffies
+        if (i < workJifCnt) {
+            workJif += jiffies[i];
+        }
+        totalJif += jiffies[i];
+    }
+    syslog(LOG_DEBUG, "Returning: %lu %lu", totalJif, workJif);
+    return {totalJif, workJif};
+}
+
+std::string Connection::getCpu() const {
+    // delta between readings
+    static constexpr std::chrono::milliseconds kDelta{1000};
+    const auto jif1 = getJiffies();
+    std::this_thread::sleep_for(kDelta);
+    const auto jif2 = getJiffies();
+    const float total = static_cast<float>(jif2.first - jif1.first);
+    const float work = static_cast<float>(jif2.second - jif1.second);
+    const float cpu = (work / total) * 100.0f;
+    return std::to_string(cpu) + "%";
+}
 
 std::string Connection::getMem() const { return std::to_string(4000); }
 

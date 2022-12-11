@@ -40,6 +40,7 @@ class Connection : public std::enable_shared_from_this<Connection> {
 
     /// @brief Returns cpu usage
     /// @return String containing cpu usage
+    /// see https://stackoverflow.com/questions/3017162/how-to-get-total-cpu-usage-in-linux-using-c
     std::string getCpu() const;
 
     /// @brief Returns memory usage

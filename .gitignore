@@ -1,5 +1,6 @@
-# build dir
+# custom
 build/
+.vscode
 
 # Prerequisites
 *.d
