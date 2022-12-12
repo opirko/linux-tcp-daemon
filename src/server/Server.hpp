@@ -29,10 +29,7 @@ class Server final {
    private:
     // methods
     /// @brief Starts the connection accept process
-    void startAccept();
-
-    /// @brief Handles accepted connection, also starts a new accept
-    void handleAccept(std::shared_ptr<Connection> con, const boost::system::error_code& error);
+    void accept();
 
     // variables
     static constexpr char kClassName[]{"Server"};

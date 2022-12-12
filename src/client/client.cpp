@@ -14,7 +14,7 @@ int main(int argc, char* argv[]) {
     // try connecting, if it doesn't work exit
     try {
         socket.connect(asiotcp::endpoint(boost::asio::ip::address::from_string(kHost), kPort));
-    } catch (const std::exception& e){
+    } catch (const std::exception& e) {
         std::cout << "Server is not running!" << std::endl;
         return 1;
     }

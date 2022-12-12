@@ -17,7 +17,7 @@ constexpr int Server::kPort;
 // Construct socket, start listening and accepting
 Server::Server() : mAcceptor(mContext, asiotcp::endpoint(asiotcp::v4(), kPort)) {
     mAcceptor.listen();
-    startAccept();
+    accept();
 }
 
 void Server::run() {
@@ -35,20 +35,17 @@ void Server::run() {
 
 // ==================== PRIVATE ====================
 
-void Server::startAccept() {
+void Server::accept() {
     syslog(LOG_DEBUG, "%s::%s", kClassName, __func__);
     auto con = std::make_shared<Connection>(mContext);
-    mAcceptor.async_accept(con->getSocket(),
-                           boost::bind(&Server::handleAccept, this, con, boost::asio::placeholders::error));
-}
-
-void Server::handleAccept(std::shared_ptr<Connection> con, const boost::system::error_code& error) {
-    syslog(LOG_DEBUG, "%s::%s", kClassName, __func__);
-    if (!error) {
-        con->start();
-    }
-    // Accept other connections as well
-    startAccept();
+    mAcceptor.async_accept(con->getSocket(), [this, con](const boost::system::error_code& error) {
+        syslog(LOG_DEBUG, "%s::acceptLambda", kClassName);
+        if (!error) {
+            con->start();
+        }
+        // Accept other connections as well
+        accept();
+    });
 }
 
 }  // namespace tcpdae
